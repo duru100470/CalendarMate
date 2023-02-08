@@ -1,23 +1,31 @@
 <script lang="ts">
+	export let targetDate: Date;
+
 	let currentDate: Date = new Date();
-	let { firstDate, lastDate } = getFirstAndLastDate(currentDate);
-	let { prevDate, nextDate } = getPrevAndNextDate(currentDate);
 
-	function getFirstAndLastDate(date: Date) {
-		let firstDate = new Date(date.getFullYear(), date.getMonth(), 1);
-		let lastDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-		return { firstDate, lastDate };
-	}
+	$: firstDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+	$: lastDate = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
+	$: prevDate = new Date(targetDate.getFullYear(), targetDate.getMonth(), 0);
+	$: nextDate = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 1);
+	$: firstDateInSixthLine = (35 - firstDate.getDay()) - lastDate.getDate();
 
-	function getPrevAndNextDate(date: Date) {
-		let prevDate = new Date(date.getFullYear(), date.getMonth(), 0);
-		let nextDate = new Date(date.getFullYear(), date.getMonth() + 1, 1);
-		return { prevDate, nextDate };
-	}
+	$: checkIsCurMonth = (i: number, j: number) => {
+		return (i === 0 && j >= firstDate.getDay())
+			|| ((firstDateInSixthLine >= 0) 
+				&& ((i > 0 && i < 4) || (i === 4 && j <= lastDate.getDay())))
+			|| ((firstDateInSixthLine < 0) 
+				&& ((i > 0 && i < 5) || (i === 5 && j <= lastDate.getDay())));
+	};
+
+	$: checkIsCurDate = (i: number, j: number) => {
+		return (firstDate.getDate() + j + i * 7 - firstDate.getDay() === currentDate.getDate())
+				&& targetDate.getMonth() === currentDate.getMonth()
+				&& targetDate.getFullYear() === currentDate.getFullYear();
+	};
 </script>
 
 <main>
-	<h1>{currentDate.getFullYear() + '.' + (currentDate.getMonth() + 1)}</h1>
+	<h1>{targetDate.getFullYear() + '.' + (targetDate.getMonth() + 1)}</h1>
 	<table>
 	<thead>
 		<tr>
@@ -31,14 +39,11 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each Array.from({length:5}, (v,i)=>i) as i }
+		{#each Array.from({length:6}, (v,i)=>i) as i }
 		<tr>
 			{#each Array.from({length:7}, (v,i)=>i) as j }
-				{#if (i === 0 && j >= firstDate.getDay())
-					|| (i === 4 && j <= lastDate.getDay())
-					|| (i > 0 && i < 4)}
-					{#if (firstDate.getDate() + j + i * 7 - firstDate.getDay() 
-						=== currentDate.getDate())}
+				{#if checkIsCurMonth(i, j)}
+					{#if checkIsCurDate(i, j)}
 					<td class="curDate">
 						{firstDate.getDate() + j + i * 7 - firstDate.getDay()}
 					</td>
@@ -51,9 +56,13 @@
 					<td class="notCurMonth">
 						{prevDate.getDate() + j + i * 7 - prevDate.getDay()}
 					</td>
+				{:else if firstDateInSixthLine <= 0}
+					<td class="notCurMonth">
+						{nextDate.getDate() + j + (i - 5) * 7 - nextDate.getDay()}
+					</td>
 				{:else}
 					<td class="notCurMonth">
-						{nextDate.getDate() + j - nextDate.getDay()}
+						{nextDate.getDate() + j + (i - 4) * 7 - nextDate.getDay()}
 					</td>
 				{/if}
 			{/each}
