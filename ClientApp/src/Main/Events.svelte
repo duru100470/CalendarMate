@@ -1,5 +1,18 @@
 <script lang="ts">
+	import { eventDBStore, event } from "./EventDBStore";
 	export let date: Date;
+
+	let eventList: event[] = [];
+
+	function checkIsSameDate(date1: Date, date2: Date): boolean {
+		return date1.getFullYear() === date2.getFullYear()
+			&& date1.getMonth() === date2.getMonth()
+			&& date1.getDate() === date2.getDate();
+	}
+
+	eventDBStore.subscribe((data) => {
+		eventList = data.filter(e => checkIsSameDate(e.date, date));
+	});
 </script>
 
 <main>
@@ -11,7 +24,9 @@
 	{/if}
 	</div>
 	<div class="event-container">
-		<button class="event-btn">Test</button>
+		{#each eventList as e}
+		<button class="event-btn">{e.title}</button>
+		{/each}
 	</div>
 </main>
 
