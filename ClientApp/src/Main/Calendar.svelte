@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Events from "./Events.svelte";
+
 	export let targetDate: Date;
 
 	let currentDate: Date = new Date();
@@ -45,24 +47,24 @@
 				{#if checkIsCurMonth(i, j)}
 					{#if checkIsCurDate(i, j)}
 					<td class="curDate">
-						{firstDate.getDate() + j + i * 7 - firstDate.getDay()}
+						<Events date={new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate() + j + i * 7 - firstDate.getDay())}/>
 					</td>
 					{:else}
 					<td>
-						{firstDate.getDate() + j + i * 7 - firstDate.getDay()}
+						<Events date={new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate() + j + i * 7 - firstDate.getDay())}/>
 					</td>
 					{/if}
 				{:else if i === 0 && j < firstDate.getDay()}
 					<td class="notCurMonth">
-						{prevDate.getDate() + j + i * 7 - prevDate.getDay()}
+						<Events date={new Date(prevDate.getFullYear(), prevDate.getMonth(), prevDate.getDate() + j + i * 7 - prevDate.getDay())}/>
 					</td>
 				{:else if firstDateInSixthLine <= 0}
 					<td class="notCurMonth">
-						{nextDate.getDate() + j + (i - 5) * 7 - nextDate.getDay()}
+						<Events date={new Date(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate() + j + (i - 5) * 7 - nextDate.getDay())}/>
 					</td>
 				{:else}
 					<td class="notCurMonth">
-						{nextDate.getDate() + j + (i - 4) * 7 - nextDate.getDay()}
+						<Events date={new Date(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate() + j + (i - 4) * 7 - nextDate.getDay())}/>
 					</td>
 				{/if}
 			{/each}
@@ -75,8 +77,6 @@
 <style>
 	main {
 		text-align: center;
-		padding: 1em;
-		max-width: 240px;
 		margin: 0 auto;
 	}
 
@@ -119,6 +119,7 @@
 	}
 
 	td {
+		margin: auto;
 		width: 120px;
 		height: 120px;
 		text-align: left;
@@ -127,14 +128,6 @@
 
 	th, td {
 		border: 1px solid #ddd;
-		padding: 8px;
-	}
-
-	td:nth-child(1), td:nth-last-child(1) {color:red;}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
+		padding: 2px;
 	}
 </style>
