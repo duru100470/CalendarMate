@@ -6,11 +6,12 @@ using CalendarMate.Models;
 
 namespace CalendarMate.Data;
 
-public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
+public class ApplicationUserDbContext : DbContext
 {
-    public ApplicationDbContext(DbContextOptions options, IOptions<OperationalStoreOptions> operationalStoreOptions)
-        : base(options, operationalStoreOptions)
+    public ApplicationUserDbContext(DbContextOptions<ApplicationUserDbContext> options)
+        : base(options)
     {
-
     }
+
+    public DbSet<CalendarMate.Models.ApplicationUser> ApplicationUsers { get; set; } = default!;
 }

@@ -19,11 +19,4 @@ public class CalendarController : ControllerBase
     {
         return "Hello World";
     }
-
-    [Route("test")]
-    [HttpGet]
-    public string Test()
-    {
-        return "Test World";
-    }
 }
