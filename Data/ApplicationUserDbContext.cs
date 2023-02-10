@@ -13,5 +13,5 @@ public class ApplicationUserDbContext : DbContext
     {
     }
 
-    public DbSet<CalendarMate.Models.ApplicationUser> ApplicationUsers { get; set; } = default!;
+    public DbSet<CalendarMate.Models.ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
 }

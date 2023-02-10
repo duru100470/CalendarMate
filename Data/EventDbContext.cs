@@ -13,5 +13,5 @@ public class EventDbContext : DbContext
     {
     }
 
-    public DbSet<CalendarMate.Models.Event> Events { get; set; } = default!;
+    public DbSet<CalendarMate.Models.Event> Events => Set<Event>();
 }
