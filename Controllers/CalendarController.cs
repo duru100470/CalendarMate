@@ -9,18 +9,18 @@ namespace CalendarMate.Controllers;
 public class CalendarController : ControllerBase
 {
     private readonly ILogger<WeatherForecastController> _logger;
-    private readonly CalendarMate.Data.EventDbContext _events;
+    private readonly CalendarMate.Data.CalendarDbContext _context;
 
-    public CalendarController(CalendarMate.Data.EventDbContext events, ILogger<WeatherForecastController> logger)
+    public CalendarController(CalendarMate.Data.CalendarDbContext context, ILogger<WeatherForecastController> logger)
     {
         _logger = logger;
-        _events = events;
+        _context = context;
     }
 
     [HttpGet]
     public async Task<IResult> Get()
     {
-        var events = await _events.Events.ToListAsync();
+        var events = await _context.Events.ToListAsync();
         return Results.Ok(events);
     }
 
@@ -35,8 +35,8 @@ public class CalendarController : ControllerBase
             UserId = _event.UserId
         };
 
-        await _events.AddAsync(newEvent);
-        await _events.SaveChangesAsync();
+        await _context.AddAsync(newEvent);
+        await _context.SaveChangesAsync();
 
         return Results.Created($"/calendar/{newEvent.EventId}", _event);
     }

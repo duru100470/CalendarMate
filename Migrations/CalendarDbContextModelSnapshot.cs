@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace CalendarMate.Migrations.EventDb
+namespace CalendarMate.Migrations
 {
-    [DbContext(typeof(EventDbContext))]
-    partial class EventDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(CalendarDbContext))]
+    partial class CalendarDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -40,7 +40,7 @@ namespace CalendarMate.Migrations.EventDb
 
                     b.HasKey("UserId");
 
-                    b.ToTable("ApplicationUser");
+                    b.ToTable("ApplicationUsers");
                 });
 
             modelBuilder.Entity("CalendarMate.Models.Event", b =>
@@ -73,12 +73,17 @@ namespace CalendarMate.Migrations.EventDb
             modelBuilder.Entity("CalendarMate.Models.Event", b =>
                 {
                     b.HasOne("CalendarMate.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("Events")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CalendarMate.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Events");
                 });
 #pragma warning restore 612, 618
         }

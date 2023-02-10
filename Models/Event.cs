@@ -23,5 +23,5 @@ public class Event
     public int UserId { get; set; }
 
     [ForeignKey("UserId")]
-    public ApplicationUser User { get; set; } = new ApplicationUser();
+    public ApplicationUser? User { get; set; }
 }

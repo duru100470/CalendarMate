@@ -22,4 +22,6 @@ public class ApplicationUser
     [Required]
     [StringLength(255)]
     public string PasswordHash { get; set; } = string.Empty;
+
+    public List<Event>? Events { get; set; }
 }

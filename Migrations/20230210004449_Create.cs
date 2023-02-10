@@ -3,16 +3,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CalendarMate.Migrations.EventDb
+namespace CalendarMate.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateEvent : Migration
+    public partial class Create : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ApplicationUser",
+                name: "ApplicationUsers",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "INTEGER", nullable: false)
@@ -23,7 +23,7 @@ namespace CalendarMate.Migrations.EventDb
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApplicationUser", x => x.UserId);
+                    table.PrimaryKey("PK_ApplicationUsers", x => x.UserId);
                 });
 
             migrationBuilder.CreateTable(
@@ -41,11 +41,11 @@ namespace CalendarMate.Migrations.EventDb
                 {
                     table.PrimaryKey("PK_Events", x => x.EventId);
                     table.ForeignKey(
-                        name: "FK_Events_ApplicationUser_UserId",
+                        name: "FK_Events_ApplicationUsers_UserId",
                         column: x => x.UserId,
-                        principalTable: "ApplicationUser",
+                        principalTable: "ApplicationUsers",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -61,7 +61,7 @@ namespace CalendarMate.Migrations.EventDb
                 name: "Events");
 
             migrationBuilder.DropTable(
-                name: "ApplicationUser");
+                name: "ApplicationUsers");
         }
     }
 }
