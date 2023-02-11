@@ -236,3 +236,7 @@ ClientApp/.vscode/
 ClientApp/node_modules/
 ClientApp/public/build/
 *.db
+
+app.db-shm
+
+app.db-wal
