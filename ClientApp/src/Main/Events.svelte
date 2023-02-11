@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { eventDBStore, event } from "./EventDBStore";
 	export let date: Date;
+	export let onClickEvent;
 
 	let eventList: event[] = [];
 
@@ -25,7 +26,7 @@
 	</div>
 	<div class="event-container">
 		{#each eventList as e}
-		<button class="event-btn">{e.title}</button>
+		<button class="event-btn" on:click={() => onClickEvent(e.eventId)}>{e.title}</button>
 		{/each}
 	</div>
 </main>

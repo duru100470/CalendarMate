@@ -1,14 +1,17 @@
 <script lang="ts">
 	import Calendar from "./Calendar.svelte";
 	import Modal from "./Modal.svelte";
+	import EventInfo from "./EventInfo.svelte";
 	import { eventDBStore } from "./EventDBStore";
 	import { fetchGet } from "../functions"
 	import type { event } from "./EventDBStore";
 
 	let showModal: boolean = false;
 	let curDate: Date = new Date();
+	let events: event[];
+	let seletedEvent: event = null;
 
-	console.log(curDate);
+	eventDBStore.subscribe(db => { events = db });
 
 	function increaseMonth(): void {
 		curDate = new Date(curDate.getFullYear(), curDate.getMonth() + 1, curDate.getDate());
@@ -16,6 +19,12 @@
 
 	function decreaseMonth(): void {
 		curDate = new Date(curDate.getFullYear(), curDate.getMonth() - 1, curDate.getDate());
+	}
+
+	function onClickEvent(id: number) {
+		console.log(id);
+		seletedEvent = events.find(e => e.eventId === id);
+		showModal = true;
 	}
 
 	async function fetchCalendarData(): Promise<void> {
@@ -35,13 +44,14 @@
 </script>
 
 <main>
-	<button on:click={() => showModal = true}>Show Modal</button>
 	{#if showModal}
-	<Modal on:close={() => showModal = false}></Modal>
+	<Modal on:close={() => showModal = false}>
+		<EventInfo curEvent={seletedEvent} />
+	</Modal>
 	{/if}
 	<button class="calendar-btn-l" on:click={decreaseMonth}>&lt;</button>
 	<button class="calendar-btn-r" on:click={increaseMonth}>&gt;</button>
-	<Calendar targetDate={curDate}/>
+	<Calendar targetDate={curDate} onClickEvent={onClickEvent}/>
 </main>
 
 <style>
