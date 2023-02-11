@@ -8,12 +8,10 @@ namespace CalendarMate.Controllers;
 [Route("[controller]")]
 public class TestController : ControllerBase
 {
-    private readonly ILogger<WeatherForecastController> _logger;
     private readonly CalendarMate.Data.CalendarDbContext _context;
 
-    public TestController(CalendarMate.Data.CalendarDbContext context, ILogger<WeatherForecastController> logger)
+    public TestController(CalendarMate.Data.CalendarDbContext context)
     {
-        _logger = logger;
         _context = context;
     }
 

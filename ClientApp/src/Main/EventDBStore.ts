@@ -5,6 +5,7 @@ type event = {
     title: string,
     date: Date,
     description: string,
+    user: string,
     userId: number}
 
 const eventDBStore = writable<event[]>([]);

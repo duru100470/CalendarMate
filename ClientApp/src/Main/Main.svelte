@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Calendar from "./Calendar.svelte";
 	import { eventDBStore } from "./EventDBStore";
+	import { fetchGet } from "../functions"
+	import type { event } from "./EventDBStore";
 
 	let curDate: Date = new Date();
 
@@ -13,6 +15,21 @@
 	function decreaseMonth(): void {
 		curDate = new Date(curDate.getFullYear(), curDate.getMonth() - 1, curDate.getDate());
 	}
+
+	async function fetchCalendarData(): Promise<void> {
+		let res = await fetchGet("/calendar");
+		let data: any[] = await res.json();
+
+		let events: event[] = data.map(e => {
+			return {
+				...e,
+				date: new Date(e.date)
+			};
+		});
+		eventDBStore.update(db => events);
+	}
+
+	fetchCalendarData();
 </script>
 
 <main>
