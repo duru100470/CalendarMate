@@ -1,5 +1,6 @@
 <script lang="ts">
     import { fetchPost } from "../functions";
+    import { eventDBStore } from "./EventDBStore";
     import type { event } from "./EventDBStore";
 
     let title: string;
@@ -16,8 +17,9 @@
             userId: 1
         };
 
-        console.log(JSON.stringify(curEvent));
-        fetchPost("/calendar", curEvent);
+        let res = await fetchPost("/calendar", curEvent);
+        
+        if (res.status !== 200) return;
     }
 
     function checkFormValid(): boolean {
