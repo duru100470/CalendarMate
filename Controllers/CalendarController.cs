@@ -39,7 +39,7 @@ public class CalendarController : ControllerBase
         return Results.Created($"/calendar/{newEvent.EventId}", _event);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<IResult> Delete(int id)
     {
         if (await _context.Events.FindAsync(id) is CalendarMate.Models.Event _event)
