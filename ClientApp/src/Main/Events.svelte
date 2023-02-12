@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { eventDBStore, event } from "./EventDBStore";
 	export let date: Date;
+	export let showEventInfo;
 
 	let eventList: event[] = [];
 
@@ -25,7 +26,7 @@
 	</div>
 	<div class="event-container">
 		{#each eventList as e}
-		<button class="event-btn">{e.title}</button>
+		<button class="event-btn" on:click={() => showEventInfo(e.eventId)}>{e.title}</button>
 		{/each}
 	</div>
 </main>
@@ -47,6 +48,7 @@
 
 	.event-btn {
 		margin: auto;
+		margin-bottom: 2px;
 		width: 100%;
 		height: 20px;
 		display: flex;

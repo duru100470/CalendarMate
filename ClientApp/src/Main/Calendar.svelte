@@ -2,6 +2,7 @@
 	import Events from "./Events.svelte";
 
 	export let targetDate: Date;
+	export let showEventInfo;
 
 	let currentDate: Date = new Date();
 
@@ -24,6 +25,12 @@
 				&& targetDate.getMonth() === currentDate.getMonth()
 				&& targetDate.getFullYear() === currentDate.getFullYear();
 	};
+
+	function setTargetDate(date: Date, offset: number): Date {
+		return new Date(firstDate.getFullYear(), 
+			date.getMonth(), 
+			date.getDate() + offset - date.getDay());
+	}
 </script>
 
 <main>
@@ -47,24 +54,24 @@
 				{#if checkIsCurMonth(i, j)}
 					{#if checkIsCurDate(i, j)}
 					<td class="curDate">
-						<Events date={new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate() + j + i * 7 - firstDate.getDay())}/>
+						<Events {showEventInfo} date={setTargetDate(firstDate, j + i * 7)}/>
 					</td>
 					{:else}
 					<td>
-						<Events date={new Date(firstDate.getFullYear(), firstDate.getMonth(), firstDate.getDate() + j + i * 7 - firstDate.getDay())}/>
+						<Events {showEventInfo} date={setTargetDate(firstDate, j + i * 7)}/>
 					</td>
 					{/if}
 				{:else if i === 0 && j < firstDate.getDay()}
 					<td class="notCurMonth">
-						<Events date={new Date(prevDate.getFullYear(), prevDate.getMonth(), prevDate.getDate() + j + i * 7 - prevDate.getDay())}/>
+						<Events {showEventInfo} date={setTargetDate(prevDate, j + i * 7)}/>
 					</td>
 				{:else if firstDateInSixthLine <= 0}
 					<td class="notCurMonth">
-						<Events date={new Date(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate() + j + (i - 5) * 7 - nextDate.getDay())}/>
+						<Events {showEventInfo} date={setTargetDate(nextDate, j + (i - 5) * 7)}/>
 					</td>
 				{:else}
 					<td class="notCurMonth">
-						<Events date={new Date(nextDate.getFullYear(), nextDate.getMonth(), nextDate.getDate() + j + (i - 4) * 7 - nextDate.getDay())}/>
+						<Events {showEventInfo} date={setTargetDate(nextDate, j + (i - 4) * 7)}/>
 					</td>
 				{/if}
 			{/each}
