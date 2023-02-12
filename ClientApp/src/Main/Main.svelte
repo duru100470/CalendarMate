@@ -2,28 +2,41 @@
 	import Calendar from "./Calendar.svelte";
 	import Modal from "./Modal.svelte";
 	import EventInfo from "./EventInfo.svelte";
+	import CreateEvent from "./CreateEvent.svelte";
 	import { eventDBStore } from "./EventDBStore";
 	import { fetchGet } from "../functions"
+	import { MainModalType } from "../util";
 	import type { event } from "./EventDBStore";
 
-	let showModal: boolean = false;
+	// Set variables
 	let curDate: Date = new Date();
 	let events: event[];
 	let seletedEvent: event = null;
+
+	// Set flags
+	let showModal: boolean = false;
+	let modalType: number = MainModalType.EventInfo;
 
 	eventDBStore.subscribe(db => { events = db });
 
 	function increaseMonth(): void {
 		curDate = new Date(curDate.getFullYear(), curDate.getMonth() + 1, curDate.getDate());
+		fetchCalendarData();
 	}
 
 	function decreaseMonth(): void {
 		curDate = new Date(curDate.getFullYear(), curDate.getMonth() - 1, curDate.getDate());
+		fetchCalendarData();
 	}
 
-	function onClickEvent(id: number) {
-		console.log(id);
+	function showEventInfo(id: number) {
 		seletedEvent = events.find(e => e.eventId === id);
+		modalType = MainModalType.EventInfo;
+		showModal = true;
+	}
+
+	function showCreateEvent() {
+		modalType = MainModalType.CreateEvent;
 		showModal = true;
 	}
 
@@ -39,19 +52,22 @@
 		});
 		eventDBStore.update(db => events);
 	}
-
-	fetchCalendarData();
 </script>
 
 <main>
 	{#if showModal}
 	<Modal on:close={() => showModal = false}>
+		{#if modalType === MainModalType.EventInfo}
 		<EventInfo curEvent={seletedEvent} />
+		{:else if modalType === MainModalType.CreateEvent}
+		<CreateEvent />
+		{/if}
 	</Modal>
 	{/if}
 	<button class="calendar-btn-l" on:click={decreaseMonth}>&lt;</button>
 	<button class="calendar-btn-r" on:click={increaseMonth}>&gt;</button>
-	<Calendar targetDate={curDate} onClickEvent={onClickEvent}/>
+	<button on:click={showCreateEvent}>Create Event</button>
+	<Calendar targetDate={curDate} {showEventInfo}/>
 </main>
 
 <style>

@@ -2,7 +2,7 @@
 	import Events from "./Events.svelte";
 
 	export let targetDate: Date;
-	export let onClickEvent;
+	export let showEventInfo;
 
 	let currentDate: Date = new Date();
 
@@ -54,24 +54,24 @@
 				{#if checkIsCurMonth(i, j)}
 					{#if checkIsCurDate(i, j)}
 					<td class="curDate">
-						<Events {onClickEvent} date={setTargetDate(firstDate, j + i * 7)}/>
+						<Events {showEventInfo} date={setTargetDate(firstDate, j + i * 7)}/>
 					</td>
 					{:else}
 					<td>
-						<Events {onClickEvent} date={setTargetDate(firstDate, j + i * 7)}/>
+						<Events {showEventInfo} date={setTargetDate(firstDate, j + i * 7)}/>
 					</td>
 					{/if}
 				{:else if i === 0 && j < firstDate.getDay()}
 					<td class="notCurMonth">
-						<Events {onClickEvent} date={setTargetDate(prevDate, j + i * 7)}/>
+						<Events {showEventInfo} date={setTargetDate(prevDate, j + i * 7)}/>
 					</td>
 				{:else if firstDateInSixthLine <= 0}
 					<td class="notCurMonth">
-						<Events {onClickEvent} date={setTargetDate(nextDate, j + (i - 5) * 7)}/>
+						<Events {showEventInfo} date={setTargetDate(nextDate, j + (i - 5) * 7)}/>
 					</td>
 				{:else}
 					<td class="notCurMonth">
-						<Events {onClickEvent} date={setTargetDate(nextDate, j + (i - 4) * 7)}/>
+						<Events {showEventInfo} date={setTargetDate(nextDate, j + (i - 4) * 7)}/>
 					</td>
 				{/if}
 			{/each}
