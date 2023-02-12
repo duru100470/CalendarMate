@@ -3,14 +3,18 @@
     export let curEvent: event;
 </script>
 
-{curEvent.eventId}
-<br />
-{curEvent.title}
-<br />
-{curEvent.date}
-<br />
-{curEvent.description}
-<br />
-{curEvent.user}
-<br />
-{curEvent.userId}
+<h2>{curEvent.title}</h2>
+<p>Event ID: {curEvent.eventId}</p>
+<p>Date: {curEvent.date}</p>
+<p>Description: {curEvent.description}</p>
+<p>User: {curEvent.user}</p>
+<p>User ID: {curEvent.userId}</p>
+
+<style>
+    h2 {
+		color: #ff3e00;
+		text-transform: uppercase;
+		font-size: 2em;
+		font-weight: 100;
+	}
+</style>

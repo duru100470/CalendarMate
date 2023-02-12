@@ -48,6 +48,7 @@
 
 	.event-btn {
 		margin: auto;
+		margin-bottom: 2px;
 		width: 100%;
 		height: 20px;
 		display: flex;

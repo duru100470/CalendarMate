@@ -73,7 +73,9 @@
 <style>
 	main {
 		text-align: center;
+		align-items: center;
 		padding: 1em;
+		max-width: 1200px;
 		margin: 0 auto;
 	}
 
