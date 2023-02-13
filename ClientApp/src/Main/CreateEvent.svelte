@@ -29,7 +29,7 @@
     }
 </script>
 
-<h1>Create Event</h1>
+<h1>New Event</h1>
 <p>Title: <input type="text" bind:value={title} /></p>
 <p>Date: <input type="date" bind:value={date} /></p>
 <p>Description: <input type="text" bind:value={description} /></p>
