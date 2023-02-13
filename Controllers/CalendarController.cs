@@ -65,6 +65,6 @@ public class CalendarController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return TypedResults.Created($"/todoitems/{_event.EventId}", _event);
+        return TypedResults.Created($"/calendar/{_event.EventId}", _event);
     }
 }
