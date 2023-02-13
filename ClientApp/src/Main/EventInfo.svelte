@@ -1,7 +1,10 @@
 <script lang="ts">
     import { fetchDelete, fetchPut } from "../functions";
+    import { createEventDispatcher } from "svelte";
     import type { event } from "./EventDBStore";
     export let curEvent: event;
+
+    const dispatch = createEventDispatcher();
 
     let newEvent = {
         title: '',
@@ -9,6 +12,7 @@
         description: '',
         userId: 1
     };
+
     // Set flags
     let showEdit: boolean = false;
 
@@ -16,11 +20,14 @@
         let res = await fetchDelete(`/calendar/${curEvent.eventId}`);
 
         console.log(res.status);
+        dispatch('deleteEvent');
     }
 
     function onClickEditBtn() {
         newEvent.title = curEvent.title;
-        newEvent.date = curEvent.date.toJSON().substring(0, 10);
+        newEvent.date = curEvent.date.getFullYear() + '-' + 
+            String(curEvent.date.getMonth() + 1).padStart(2, '0') + '-' +
+            String(curEvent.date.getDate()).padStart(2, '0');
         newEvent.description = curEvent.description;
         showEdit = true;
     }
@@ -31,6 +38,9 @@
 
         console.log(res.status);
         showEdit = false;
+        curEvent.title = newEvent.title;
+        curEvent.description = newEvent.description;
+        dispatch('updateEvent');
     }
 
 </script>

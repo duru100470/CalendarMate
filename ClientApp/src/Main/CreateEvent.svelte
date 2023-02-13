@@ -1,7 +1,10 @@
 <script lang="ts">
     import { fetchPost } from "../functions";
+    import { createEventDispatcher } from "svelte";
     import { eventDBStore } from "./EventDBStore";
     import type { event } from "./EventDBStore";
+
+    const dispatch = createEventDispatcher();
 
     let title: string;
     let date: Date;
@@ -18,8 +21,8 @@
         };
 
         let res = await fetchPost("/calendar", curEvent);
-        
-        if (res.status !== 200) return;
+
+        dispatch('createEvent');
     }
 
     function checkFormValid(): boolean {
