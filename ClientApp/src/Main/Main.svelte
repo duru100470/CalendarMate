@@ -50,23 +50,32 @@
 				date: new Date(e.date)
 			};
 		});
+
+		console.log(events);
 		eventDBStore.update(db => events);
 	}
+
+	function testFetch(): void {
+		fetchCalendarData();
+	}
+
+	fetchCalendarData();
 </script>
 
 <main>
 	{#if showModal}
 	<Modal on:close={() => showModal = false}>
 		{#if modalType === MainModalType.EventInfo}
-		<EventInfo curEvent={seletedEvent} />
+		<EventInfo on:deleteEvent={() => {fetchCalendarData(); showModal = false}} on:updateEvent={fetchCalendarData} curEvent={seletedEvent} />
 		{:else if modalType === MainModalType.CreateEvent}
-		<CreateEvent />
+		<CreateEvent on:createEvent={() => {fetchCalendarData(); showModal = false}} />
 		{/if}
 	</Modal>
 	{/if}
 	<button class="calendar-btn-l" on:click={decreaseMonth}>&lt;</button>
 	<button class="calendar-btn-r" on:click={increaseMonth}>&gt;</button>
 	<button on:click={showCreateEvent}>Create Event</button>
+	<button on:click={testFetch}>Force Fetch</button>
 	<Calendar targetDate={curDate} {showEventInfo}/>
 </main>
 
