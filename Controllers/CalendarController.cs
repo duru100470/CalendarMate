@@ -39,7 +39,7 @@ public class CalendarController : ControllerBase
         return Results.Created($"/calendar/{newEvent.EventId}", _event);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<IResult> Delete(int id)
     {
         if (await _context.Events.FindAsync(id) is CalendarMate.Models.Event _event)
@@ -50,5 +50,21 @@ public class CalendarController : ControllerBase
         }
 
         return TypedResults.NotFound();
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IResult> Put(int id, CalendarMate.Models.Event inputEvent)
+    {
+        var _event = await _context.Events.FindAsync(id);
+
+        if (_event is null) return TypedResults.NotFound();
+
+        _event.Title = inputEvent.Title;
+        _event.Date = inputEvent.Date;
+        _event.Description = inputEvent.Description;
+
+        await _context.SaveChangesAsync();
+
+        return TypedResults.Created($"/todoitems/{_event.EventId}", _event);
     }
 }
