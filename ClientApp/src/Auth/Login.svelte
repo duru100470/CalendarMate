@@ -1,14 +1,14 @@
 <script lang="ts">
     import { fetchPost } from '../functions'
 
-    let userName = '';
+    let username = '';
     let password = '';
     let validMessage = '';
 
     function clickLoginBtn(): void {
         validMessage = '';
 
-        if (userName === '') {
+        if (username === '') {
             validMessage = 'Username field is empty';
             return;
         }
@@ -25,7 +25,7 @@
     <form>
         <p class="valid">{validMessage}</p>
         <p>Username</p>
-        <p><input class="field" type="text" bind:value={userName} required/></p>
+        <p><input class="field" type="text" bind:value={username} required/></p>
         <p>Password</p>
         <p><input class="field" type="password" bind:value={password} required/></p>
         <p>Forgot Password?</p>

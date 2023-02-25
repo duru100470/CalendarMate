@@ -5,6 +5,7 @@
 	import Login from "./Auth/Login.svelte";
 	import Register from "./Auth/Register.svelte";
 	import NotFound from "./Error/404.svelte";
+	import NavBar from "./NavBar.svelte";
 	import Router from "svelte-spa-router";
 	const routes = {
 		'/': Home,
@@ -17,5 +18,6 @@
 </script>
 
 <main>
+	<NavBar />
 	<Router {routes} />
 </main>

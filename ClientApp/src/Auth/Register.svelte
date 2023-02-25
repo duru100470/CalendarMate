@@ -1,7 +1,7 @@
 <script lang="ts">
     import { fetchPost } from '../functions'
 
-    let userName = '';
+    let username = '';
     let email = '';
     let password = '';
     let passwordConfirm = '';
@@ -10,7 +10,7 @@
     function clickRegisterBtn(): void {
         validMessage = '';
 
-        if (userName === '') {
+        if (username === '') {
             validMessage = 'Username field is empty';
             return;
         }
@@ -44,7 +44,7 @@
     <form>
         <p class="valid">{validMessage}</p>
         <p>Username</p>
-        <p><input class="field" type="text" bind:value={userName}/></p>
+        <p><input class="field" type="text" bind:value={username}/></p>
         <p>Email</p>
         <p><input class="field" type="email" bind:value={email}/></p>
         <p>Password</p>
