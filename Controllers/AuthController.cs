@@ -36,14 +36,7 @@ public class AuthController : ControllerBase
         if (existUser.Count() > 0) return Results.Conflict();
 
         var password = _user.PasswordHash;
-        string passwordHash;
-
-        using (SHA256 sha = SHA256.Create())
-        {
-            var origin = Encoding.UTF8.GetBytes(password);
-            var hash = sha.ComputeHash(origin);
-            passwordHash = Convert.ToBase64String(hash);
-        }
+        string passwordHash = GetSHA256(password);
 
         var newUser = new ApplicationUser
         {
@@ -56,5 +49,33 @@ public class AuthController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Results.Created($"/auth/register/{newUser.UserId}", newUser);
+    }
+
+    [Route("login")]
+    [HttpPost]
+    public IResult Login(ApplicationUser _user)
+    {
+        var user = _context.ApplicationUsers.Where(u => u.Email == _user.Email).FirstOrDefault();
+
+        if (user == null) return Results.NotFound();
+        else if (user.PasswordHash != GetSHA256(_user.PasswordHash)) return Results.Unauthorized();
+        else
+        {
+            Response.Cookies.Append("CalendarMate", user.PasswordHash, new CookieOptions
+            {
+                Expires = DateTime.Now.AddDays(1)
+            });
+            return Results.Ok();
+        }
+    }
+
+    private string GetSHA256(string text)
+    {
+        using (SHA256 sha = SHA256.Create())
+        {
+            var origin = Encoding.UTF8.GetBytes(text);
+            var hash = sha.ComputeHash(origin);
+            return Convert.ToBase64String(hash);
+        }
     }
 }
