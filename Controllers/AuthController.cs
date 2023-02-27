@@ -12,6 +12,7 @@ namespace CalendarMate.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly CalendarMate.Data.CalendarDbContext _context;
+    private readonly Dictionary<Guid, ApplicationUser> session = new Dictionary<Guid, ApplicationUser>();
 
     public AuthController(CalendarMate.Data.CalendarDbContext context)
     {
@@ -61,11 +62,41 @@ public class AuthController : ControllerBase
         else if (user.PasswordHash != GetSHA256(_user.PasswordHash)) return Results.Unauthorized();
         else
         {
-            Response.Cookies.Append("CalendarMate", user.PasswordHash, new CookieOptions
+            var ssid = Guid.NewGuid();
+
+            session[ssid] = user;
+            Console.WriteLine($"GUID: {ssid.ToString()}, Username: {user.UserName}");
+
+            Response.Cookies.Append("Auth", ssid.ToString(), new CookieOptions
             {
                 Expires = DateTime.Now.AddDays(1)
             });
+            foreach (var kv in session)
+            {
+                Console.WriteLine($"{kv.Key.ToString()}");
+            }
             return Results.Ok();
+        }
+    }
+
+    [Route("logout")]
+    [HttpPost]
+    public IResult Logout()
+    {
+        var ssid = Request.Cookies["Auth"];
+        if (ssid == null) return Results.BadRequest();
+
+        var ret = session.Remove(Guid.Parse(ssid));
+
+        if (ret)
+        {
+            Console.WriteLine($"SSID {ssid} has been deleted.");
+            Response.Cookies.Delete("Auth");
+            return Results.Ok();
+        }
+        else
+        {
+            return Results.NotFound();
         }
     }
 
