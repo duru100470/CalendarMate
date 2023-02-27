@@ -7,6 +7,7 @@
 	import NotFound from "./Error/404.svelte";
 	import NavBar from "./NavBar.svelte";
 	import Router from "svelte-spa-router";
+
 	const routes = {
 		'/': Home,
 		'/test': Test,

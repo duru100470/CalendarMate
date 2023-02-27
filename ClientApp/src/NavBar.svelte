@@ -1,6 +1,19 @@
 <script lang="ts">
+    import type { UserInfo } from "./UserInfoStore";
+    import { userinfo } from "./UserInfoStore";
+
     let isLoggedIn = false;
-    let username = 'Test';
+    let user: UserInfo = {username: 'test', email: 'test@gmail.com'};
+    
+    userinfo.subscribe(data => {
+        user = data;
+        if (user === null) isLoggedIn = false;
+        else isLoggedIn = true;
+    })
+
+    function logout(): void {
+        userinfo.set(null);
+    }
 </script>
 
 <main>
@@ -8,7 +21,8 @@
 <div class="menu"><a href="/#">Home</a></div>
 <div class="menu"><a href="/#/main">Main</a></div>
 {#if isLoggedIn}
-    <div class="account"><a href="/#/auth/account">Hello, {username}</a></div>
+    <div class="account"><a href="/#/auth/login" on:click={logout}>Logout</a></div>
+    <div class="account"><a href="/#/auth/account">Hello, {user.username}</a></div>
 {:else}
     <div class="account"><a href="/#/auth/login">Login</a></div>
 {/if}
