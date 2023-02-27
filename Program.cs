@@ -22,9 +22,10 @@ var app = builder.Build();
 
 app.UseCors(options =>
 {
-    options.AllowAnyOrigin();
+    options.WithOrigins("http://localhost:8080");
     options.AllowAnyHeader();
     options.AllowAnyMethod();
+    options.AllowCredentials();
 });
 
 // Configure the HTTP request pipeline.

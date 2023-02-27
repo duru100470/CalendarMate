@@ -68,7 +68,10 @@ public class AuthController : ControllerBase
 
             Response.Cookies.Append("Auth", ssid.ToString(), new CookieOptions
             {
-                Expires = DateTime.Now.AddDays(1)
+                Expires = DateTime.Now.AddDays(1),
+                SameSite = SameSiteMode.None,
+                Secure = true,
+                HttpOnly = true
             });
 
             return Results.Ok();

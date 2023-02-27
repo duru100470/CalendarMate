@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { UserInfo } from "./UserInfoStore";
     import { userinfo } from "./UserInfoStore";
+    import { fetchPost } from './functions';
 
     let isLoggedIn = false;
     let user: UserInfo = {username: 'test', email: 'test@gmail.com'};
@@ -11,7 +12,8 @@
         else isLoggedIn = true;
     })
 
-    function logout(): void {
+    async function logout(): Promise<void> {
+        await fetchPost('/auth/logout', null);
         userinfo.set(null);
     }
 </script>
@@ -24,6 +26,7 @@
     <div class="account"><a href="/#/auth/login" on:click={logout}>Logout</a></div>
     <div class="account"><a href="/#/auth/account">Hello, {user.username}</a></div>
 {:else}
+    <div class="account"><a href="/#/auth/login" on:click={logout}>Logout</a></div>
     <div class="account"><a href="/#/auth/login">Login</a></div>
 {/if}
 </main>
