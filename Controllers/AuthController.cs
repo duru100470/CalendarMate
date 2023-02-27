@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CalendarMate;
 using CalendarMate.Models;
+using CalendarMate.Services;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -12,11 +13,12 @@ namespace CalendarMate.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly CalendarMate.Data.CalendarDbContext _context;
-    private readonly Dictionary<Guid, ApplicationUser> session = new Dictionary<Guid, ApplicationUser>();
+    private readonly ISessionStorage _session;
 
-    public AuthController(CalendarMate.Data.CalendarDbContext context)
+    public AuthController(CalendarMate.Data.CalendarDbContext context, ISessionStorage session)
     {
         _context = context;
+        _session = session;
     }
 
     [Route("test")]
@@ -62,19 +64,13 @@ public class AuthController : ControllerBase
         else if (user.PasswordHash != GetSHA256(_user.PasswordHash)) return Results.Unauthorized();
         else
         {
-            var ssid = Guid.NewGuid();
-
-            session[ssid] = user;
-            Console.WriteLine($"GUID: {ssid.ToString()}, Username: {user.UserName}");
+            _session.AddUser(user, out var ssid);
 
             Response.Cookies.Append("Auth", ssid.ToString(), new CookieOptions
             {
                 Expires = DateTime.Now.AddDays(1)
             });
-            foreach (var kv in session)
-            {
-                Console.WriteLine($"{kv.Key.ToString()}");
-            }
+
             return Results.Ok();
         }
     }
@@ -86,9 +82,7 @@ public class AuthController : ControllerBase
         var ssid = Request.Cookies["Auth"];
         if (ssid == null) return Results.BadRequest();
 
-        var ret = session.Remove(Guid.Parse(ssid));
-
-        if (ret)
+        if (_session.RemoveUser(Guid.Parse(ssid)))
         {
             Console.WriteLine($"SSID {ssid} has been deleted.");
             Response.Cookies.Delete("Auth");
