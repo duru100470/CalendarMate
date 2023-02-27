@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using CalendarMate.Data;
 using CalendarMate.Models;
+using CalendarMate.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,10 +13,10 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<CalendarDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
 builder.Services.AddControllers();
-
 builder.Services.AddCors();
+
+builder.Services.AddSingleton<ISessionStorage, SessionStorage>();
 
 var app = builder.Build();
 
