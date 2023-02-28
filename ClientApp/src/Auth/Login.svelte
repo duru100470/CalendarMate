@@ -1,5 +1,7 @@
 <script lang="ts">
-    import { fetchPost } from '../functions'
+    import type { UserInfo } from '../UserInfoStore';
+    import { userinfo } from '../UserInfoStore';
+    import { fetchGet, fetchPost } from '../functions'
 
     let email = '';
     let password = '';
@@ -31,15 +33,27 @@
             "PasswordHash": password
         });
 
-        console.log(ret.status);
-        switch (ret.status)
+        await processLogin(ret.status);
+    }
+
+    async function processLogin(status: number): Promise<void> {
+        switch (status)
         {
             case 404:
                 validMessage = 'This account does not exist';
                 break;
-
             case 401:
                 validMessage = 'Email or Password is incorrect';
+                break;
+            case 200:
+                let res = await fetchGet('/auth/account');
+                if (res.status != 200) {
+                    validMessage = "Something went wrong...";
+                    return;
+                }
+                
+                let data: UserInfo = await res.json();
+                userinfo.set(data);
                 break;
         }
     }
