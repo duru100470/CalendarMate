@@ -54,6 +54,20 @@ public class AuthController : ControllerBase
         return Results.Created($"/auth/register/{newUser.UserId}", newUser);
     }
 
+    [Route("account")]
+    [HttpGet]
+    public IResult GetAccount()
+    {
+        var ssid = Request.Cookies["Auth"];
+        if (ssid == null) return Results.BadRequest();
+        if (!_session.Exist(Guid.Parse(ssid))) return Results.Unauthorized();
+
+        var userinfo = _session.GetUser(Guid.Parse(ssid));
+        userinfo.PasswordHash = "";
+
+        return Results.Ok(userinfo);
+    }
+
     [Route("login")]
     [HttpPost]
     public IResult Login(ApplicationUser _user)

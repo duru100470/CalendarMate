@@ -5,6 +5,7 @@ public interface ISessionStorage
 {
     bool AddUser(ApplicationUser user, out Guid guid);
     bool RemoveUser(Guid guid);
+    ApplicationUser GetUser(Guid guid);
     bool Exist(Guid guid);
 }
 
@@ -34,6 +35,11 @@ public class SessionStorage : ISessionStorage
     public bool Exist(Guid guid)
     {
         return session.ContainsKey(guid);
+    }
+
+    public ApplicationUser GetUser(Guid guid)
+    {
+        return session[guid];
     }
 
     private void Print()
