@@ -55,6 +55,34 @@ public class AuthController : ControllerBase
         return Results.Created($"/auth/register/{newUser.UserId}", newUser);
     }
 
+    [Route("verify")]
+    [HttpGet]
+    public async Task<IResult> VerifyEmail([FromQuery(Name = "id")] int id, [FromQuery(Name = "token")] string token)
+    {
+        var user = await 
+        (
+            from u in _context.ApplicationUsers
+            where u.UserId == id
+            select u
+        ).FirstOrDefaultAsync();
+
+        if (user == null) return Results.NotFound();
+
+        if (user.EmailToken == string.Empty)
+        {
+            user.EmailToken = GenerateToken(32);
+            await _context.SaveChangesAsync();
+            return Results.Problem();
+        }
+
+        if (user.EmailToken != token) return Results.Unauthorized();
+
+        user.IsVerified = true;
+        await _context.SaveChangesAsync();
+
+        return Results.Ok();
+    }
+
     [Route("account")]
     [HttpGet]
     public IResult GetAccount()
