@@ -1,5 +1,7 @@
 <script lang="ts">
+    import type { UserInfo } from '../UserInfoStore';
     import { fetchPost } from '../functions'
+  import { eventDBStore } from '../Main/EventDBStore';
 
     let username = '';
     let email = '';
@@ -7,35 +9,66 @@
     let passwordConfirm = '';
     let validMessage = '';
 
-    function clickRegisterBtn(): void {
+    async function clickRegisterBtn(): Promise<void> {
+        if (!checkValidation()) return;
+
+        let newUser: UserInfo = {
+            userId: 1,
+            userName: username,
+            email: email,
+            passwordHash: password,
+            events: null
+        };
+
+        let res = await fetchPost('/auth/register', newUser);
+        await processRegister(res.status);
+    }
+
+    async function processRegister(status: number): Promise<void> {
+        switch (status) {
+            case 201:
+                document.location.href = '/#/auth/login';
+                break;
+            case 409:
+                validMessage = 'This username or email is already used';
+                return;
+            default:
+                validMessage = 'Unexpected error occured';
+                return;
+        }
+    }
+
+    function checkValidation(): boolean {
         validMessage = '';
 
         if (username === '') {
             validMessage = 'Username field is empty';
-            return;
+            return false;
         }
 
         if (email === '') {
             validMessage = 'Email field is empty';
-            return;
+            return false;
         }
 
         let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
 
         if (!regex.test(email)) {
             validMessage = 'Email field is not valid';
-            return;
+            return false;
         }
 
         if (password === '') {
             validMessage = 'Password field is empty';
-            return;
+            return false;
         }
 
         if (password !== passwordConfirm) {
             validMessage = 'Password does not match';
-            return;
+            return false;
         }
+        
+        return true;
     }
 </script>
 

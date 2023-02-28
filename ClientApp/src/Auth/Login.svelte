@@ -8,24 +8,8 @@
     let validMessage = '';
 
     async function clickLoginBtn(): Promise<void> {
-        validMessage = '';
 
-        if (email === '') {
-            validMessage = 'Email field is empty';
-            return;
-        }
-
-        let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
-
-        if (!regex.test(email)) {
-            validMessage = 'Email field is not valid';
-            return;
-        }
-
-        if (password === '') {
-            validMessage = 'Password field is empty';
-            return;
-        }
+        if (!checkValidation()) return;
 
         let ret = await fetchPost('/auth/login', {
             "UserName": 'username',
@@ -39,12 +23,6 @@
     async function processLogin(status: number): Promise<void> {
         switch (status)
         {
-            case 404:
-                validMessage = 'This account does not exist';
-                break;
-            case 401:
-                validMessage = 'Email or Password is incorrect';
-                break;
             case 200:
                 let res = await fetchGet('/auth/account');
                 if (res.status != 200) {
@@ -54,8 +32,41 @@
                 
                 let data: UserInfo = await res.json();
                 userinfo.set(data);
+                document.location.href = '/';
+                break;
+            case 401:
+                validMessage = 'Email or Password is incorrect';
+                break;
+            case 404:
+                validMessage = 'This account does not exist';
+                break;
+            default:
+                validMessage = 'Unexpected error occured';
                 break;
         }
+    }
+
+    function checkValidation(): boolean {
+        validMessage = '';
+
+        if (email === '') {
+            validMessage = 'Email field is empty';
+            return false;
+        }
+
+        let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
+
+        if (!regex.test(email)) {
+            validMessage = 'Email field is not valid';
+            return false;
+        }
+
+        if (password === '') {
+            validMessage = 'Password field is empty';
+            return false;
+        }
+
+        return true;
     }
 </script>
 
