@@ -79,7 +79,7 @@ public class AuthController : ControllerBase
     }
 
     [Route("logout")]
-    [HttpPost]
+    [HttpGet]
     public IResult Logout()
     {
         var ssid = Request.Cookies["Auth"];
@@ -88,7 +88,12 @@ public class AuthController : ControllerBase
         if (_session.RemoveUser(Guid.Parse(ssid)))
         {
             Console.WriteLine($"SSID {ssid} has been deleted.");
-            Response.Cookies.Delete("Auth");
+            Response.Cookies.Delete("Auth", new CookieOptions
+            {
+                SameSite = SameSiteMode.None,
+                Secure = true,
+                HttpOnly = true
+            });
             return Results.Ok();
         }
         else
