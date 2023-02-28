@@ -1,8 +1,11 @@
 import { writable } from "svelte/store";
 
 type UserInfo = {
-    username: string,
-    email: string
+    userId: number,
+    userName: string,
+    email: string,
+    passwordHash: string,
+    events: any
 }
 
 const getUserInfo: () => UserInfo = () => JSON.parse(sessionStorage.getItem('userinfo'));

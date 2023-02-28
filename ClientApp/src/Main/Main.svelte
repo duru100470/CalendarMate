@@ -51,7 +51,6 @@
 			};
 		});
 
-		console.log(events);
 		eventDBStore.update(db => events);
 	}
 

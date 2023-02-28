@@ -4,6 +4,7 @@ function fetchGet(url: string) {
   return fetch(baseLink + url, {
     method: "GET",
     mode: "cors",
+    credentials: "include"
   });
 }
 
@@ -28,6 +29,7 @@ function fetchPut(url: string, data: any) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
+    credentials: "include"
   });
 }
 
@@ -35,6 +37,7 @@ function fetchDelete(url: string) {
   return fetch(baseLink + url, {
     method: "DELETE",
     mode: "cors",
+    credentials: "include"
   });
 }
 

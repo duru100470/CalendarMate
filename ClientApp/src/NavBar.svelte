@@ -1,10 +1,10 @@
 <script lang="ts">
     import type { UserInfo } from "./UserInfoStore";
     import { userinfo } from "./UserInfoStore";
-    import { fetchPost } from './functions';
+    import { fetchGet } from './functions';
 
     let isLoggedIn = false;
-    let user: UserInfo = {username: 'test', email: 'test@gmail.com'};
+    let user: UserInfo = null;
     
     userinfo.subscribe(data => {
         user = data;
@@ -13,7 +13,7 @@
     })
 
     async function logout(): Promise<void> {
-        await fetchPost('/auth/logout', null);
+        await fetchGet('/auth/logout');
         userinfo.set(null);
     }
 </script>
@@ -23,10 +23,9 @@
 <div class="menu"><a href="/#">Home</a></div>
 <div class="menu"><a href="/#/main">Main</a></div>
 {#if isLoggedIn}
-    <div class="account"><a href="/#/auth/login" on:click={logout}>Logout</a></div>
-    <div class="account"><a href="/#/auth/account">Hello, {user.username}</a></div>
+    <div class="account"><a href="/" on:click={logout}>Logout</a></div>
+    <div class="account"><a href="/#/auth/account">Hello, {user.userName}</a></div>
 {:else}
-    <div class="account"><a href="/#/auth/login" on:click={logout}>Logout</a></div>
     <div class="account"><a href="/#/auth/login">Login</a></div>
 {/if}
 </main>
