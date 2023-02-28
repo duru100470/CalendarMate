@@ -45,13 +45,42 @@ public class AuthController : ControllerBase
         {
             UserName = _user.UserName,
             Email = _user.Email,
-            PasswordHash = passwordHash
+            PasswordHash = passwordHash,
+            EmailToken = GenerateToken(32)
         };
 
         await _context.ApplicationUsers.AddAsync(newUser);
         await _context.SaveChangesAsync();
 
         return Results.Created($"/auth/register/{newUser.UserId}", newUser);
+    }
+
+    [Route("verify")]
+    [HttpGet]
+    public async Task<IResult> VerifyEmail([FromQuery(Name = "id")] int id, [FromQuery(Name = "token")] string token)
+    {
+        var user = await 
+        (
+            from u in _context.ApplicationUsers
+            where u.UserId == id
+            select u
+        ).FirstOrDefaultAsync();
+
+        if (user == null) return Results.NotFound();
+
+        if (user.EmailToken == string.Empty)
+        {
+            user.EmailToken = GenerateToken(32);
+            await _context.SaveChangesAsync();
+            return Results.Problem();
+        }
+
+        if (user.EmailToken != token) return Results.Unauthorized();
+
+        user.IsVerified = true;
+        await _context.SaveChangesAsync();
+
+        return Results.Ok();
     }
 
     [Route("account")]
@@ -114,6 +143,15 @@ public class AuthController : ControllerBase
         {
             return Results.NotFound();
         }
+    }
+
+    private string GenerateToken(int size)
+    {
+        Random random = new Random();
+        byte[] token = new byte[size];
+
+        random.NextBytes(token);
+        return Convert.ToBase64String(token);
     }
 
     private string GetSHA256(string text)
