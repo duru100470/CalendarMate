@@ -23,5 +23,9 @@ public class ApplicationUser
     [StringLength(255)]
     public string PasswordHash { get; set; } = string.Empty;
 
+    public bool IsVerified { get; set; } = false;
+
+    public string EmailToken { get; set; } = string.Empty;
+
     public List<Event>? Events { get; set; }
 }
