@@ -16,6 +16,7 @@ function fetchPost(url: string, data: any) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
+    credentials: "include"
   });
 }
 

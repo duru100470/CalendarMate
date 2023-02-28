@@ -1,21 +1,46 @@
 <script lang="ts">
     import { fetchPost } from '../functions'
 
-    let username = '';
+    let email = '';
     let password = '';
     let validMessage = '';
 
-    function clickLoginBtn(): void {
+    async function clickLoginBtn(): Promise<void> {
         validMessage = '';
 
-        if (username === '') {
-            validMessage = 'Username field is empty';
+        if (email === '') {
+            validMessage = 'Email field is empty';
+            return;
+        }
+
+        let regex = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
+
+        if (!regex.test(email)) {
+            validMessage = 'Email field is not valid';
             return;
         }
 
         if (password === '') {
             validMessage = 'Password field is empty';
             return;
+        }
+
+        let ret = await fetchPost('/auth/login', {
+            "UserName": 'username',
+            "Email": email,
+            "PasswordHash": password
+        });
+
+        console.log(ret.status);
+        switch (ret.status)
+        {
+            case 404:
+                validMessage = 'This account does not exist';
+                break;
+
+            case 401:
+                validMessage = 'Email or Password is incorrect';
+                break;
         }
     }
 </script>
@@ -24,8 +49,8 @@
     <h1>Login</h1>
     <form>
         <p class="valid">{validMessage}</p>
-        <p>Username</p>
-        <p><input class="field" type="text" bind:value={username} required/></p>
+        <p>Email</p>
+        <p><input class="field" type="text" bind:value={email} required/></p>
         <p>Password</p>
         <p><input class="field" type="password" bind:value={password} required/></p>
         <p>Forgot Password?</p>
