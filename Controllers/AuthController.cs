@@ -54,6 +54,20 @@ public class AuthController : ControllerBase
         return Results.Created($"/auth/register/{newUser.UserId}", newUser);
     }
 
+    [Route("account")]
+    [HttpGet]
+    public IResult GetAccount()
+    {
+        var ssid = Request.Cookies["Auth"];
+        if (ssid == null) return Results.BadRequest();
+        if (!_session.Exist(Guid.Parse(ssid))) return Results.Unauthorized();
+
+        var userinfo = _session.GetUser(Guid.Parse(ssid));
+        userinfo.PasswordHash = "";
+
+        return Results.Ok(userinfo);
+    }
+
     [Route("login")]
     [HttpPost]
     public IResult Login(ApplicationUser _user)
@@ -79,7 +93,7 @@ public class AuthController : ControllerBase
     }
 
     [Route("logout")]
-    [HttpPost]
+    [HttpGet]
     public IResult Logout()
     {
         var ssid = Request.Cookies["Auth"];
@@ -88,7 +102,12 @@ public class AuthController : ControllerBase
         if (_session.RemoveUser(Guid.Parse(ssid)))
         {
             Console.WriteLine($"SSID {ssid} has been deleted.");
-            Response.Cookies.Delete("Auth");
+            Response.Cookies.Delete("Auth", new CookieOptions
+            {
+                SameSite = SameSiteMode.None,
+                Secure = true,
+                HttpOnly = true
+            });
             return Results.Ok();
         }
         else
