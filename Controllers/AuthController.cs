@@ -45,7 +45,8 @@ public class AuthController : ControllerBase
         {
             UserName = _user.UserName,
             Email = _user.Email,
-            PasswordHash = passwordHash
+            PasswordHash = passwordHash,
+            EmailToken = GenerateToken(32)
         };
 
         await _context.ApplicationUsers.AddAsync(newUser);
@@ -114,6 +115,15 @@ public class AuthController : ControllerBase
         {
             return Results.NotFound();
         }
+    }
+
+    private string GenerateToken(int size)
+    {
+        Random random = new Random();
+        byte[] token = new byte[size];
+
+        random.NextBytes(token);
+        return Convert.ToBase64String(token);
     }
 
     private string GetSHA256(string text)
