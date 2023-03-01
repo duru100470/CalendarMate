@@ -1,13 +1,14 @@
 <script lang="ts">
     import type { UserInfo } from '../UserInfoStore';
     import { fetchPost } from '../functions'
-  import { eventDBStore } from '../Main/EventDBStore';
 
     let username = '';
     let email = '';
     let password = '';
     let passwordConfirm = '';
     let validMessage = '';
+
+    let isRegistrationFinished: boolean = false;
 
     async function clickRegisterBtn(): Promise<void> {
         if (!checkValidation()) return;
@@ -27,7 +28,7 @@
     async function processRegister(status: number): Promise<void> {
         switch (status) {
             case 201:
-                document.location.href = '/#/auth/login';
+                isRegistrationFinished = true;
                 break;
             case 409:
                 validMessage = 'This username or email is already used';
@@ -74,6 +75,7 @@
 
 <main>
     <h1>Register</h1>
+    {#if !isRegistrationFinished}
     <form>
         <p class="valid">{validMessage}</p>
         <p>Username</p>
@@ -86,6 +88,9 @@
         <p><input class="field" type="password" bind:value={passwordConfirm}/></p>
     </form>
     <button class="field" on:click={clickRegisterBtn}>Register</button>
+    {:else}
+    <p class="verify">Registration is finished!! Check your email to verify your account</p>
+    {/if}
 </main>
 
 <style>
@@ -114,6 +119,10 @@
     }
 
     .valid {
+		color: #ff3e00;
+    }
+
+    .verify {
 		color: #ff3e00;
     }
 </style>
