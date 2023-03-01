@@ -17,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddCors();
 
 builder.Services.AddSingleton<ISessionStorage, SessionStorage>();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 var app = builder.Build();
 
