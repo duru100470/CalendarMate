@@ -87,6 +87,21 @@ public class AuthController : ControllerBase
         return Results.Ok();
     }
 
+    [Route("recover")]
+    [HttpGet]
+    public async Task<IResult> RecoverPassword([FromQuery(Name = "id")] int id, [FromQuery(Name = "token")] string token)
+    {
+        var user = await _context.ApplicationUsers.FindAsync(id);
+
+        if (user is null) return TypedResults.NotFound();
+        if (user.EmailToken != token) return Results.Unauthorized();
+
+        user.PasswordHash = GetSHA256("password");
+        await _context.SaveChangesAsync();
+
+        return Results.Accepted();
+    }
+
     [Route("account")]
     [HttpGet]
     public IResult GetAccount()
