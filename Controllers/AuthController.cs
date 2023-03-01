@@ -35,8 +35,8 @@ public class AuthController : ControllerBase
     public async Task<IResult> Register(ApplicationUser _user)
     {
         var existUser = from u in _context.ApplicationUsers
-            where u.Email == _user.Email || u.UserName == _user.UserName
-            select u;
+                        where u.Email == _user.Email || u.UserName == _user.UserName
+                        select u;
 
         if (existUser.Count() > 0) return Results.Conflict();
 
@@ -51,7 +51,8 @@ public class AuthController : ControllerBase
             EmailToken = GenerateToken(32)
         };
 
-        _emailSender.SendMail(newUser.Email, "[CalendarMate] Verify your account", $"Verification link => <a href=\"https://localhost:5000/auth/verify?email={newUser.Email}&token={newUser.EmailToken}\">Click me!!<a>");
+        _emailSender.SendMail(newUser.Email, "[CalendarMate] Verify your account", 
+            $"Verification link => https://localhost:5000/auth/verify?email={newUser.Email}&token={newUser.EmailToken}");
 
         await _context.ApplicationUsers.AddAsync(newUser);
         await _context.SaveChangesAsync();
@@ -63,7 +64,7 @@ public class AuthController : ControllerBase
     [HttpGet]
     public async Task<IResult> VerifyEmail([FromQuery(Name = "email")] string email, [FromQuery(Name = "token")] string token)
     {
-        var user = await 
+        var user = await
         (
             from u in _context.ApplicationUsers
             where u.Email == email
@@ -94,7 +95,7 @@ public class AuthController : ControllerBase
         var user = await
         (
             from u in _context.ApplicationUsers
-            where u.Email == _user.Email && u.UserName == _user.UserName
+            where (u.Email == _user.Email && u.UserName == _user.UserName)
             select u
         ).FirstAsync();
 
@@ -104,9 +105,7 @@ public class AuthController : ControllerBase
         await _context.SaveChangesAsync();
 
         _emailSender.SendMail(user.Email, "[CalendarMate] Recover your account", 
-        $"""
-        Recovery link => <a href=\"https://localhost:5000/auth/verify?email={user.Email}&token={user.EmailToken}\">Click this link to reset password to \"password\"<a>
-        """);
+            $" Recovery link => https://localhost:5000/auth/recover?id={user.UserId}&token={user.EmailToken} Click this link to reset password to (password)");
         return Results.Ok();
     }
 
