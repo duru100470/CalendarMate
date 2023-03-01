@@ -87,6 +87,29 @@ public class AuthController : ControllerBase
         return Results.Ok();
     }
 
+    [Route("forgot")]
+    [HttpPost]
+    public async Task<IResult> ForgotPassword(ApplicationUser _user)
+    {
+        var user = await
+        (
+            from u in _context.ApplicationUsers
+            where u.Email == _user.Email && u.UserName == _user.UserName
+            select u
+        ).FirstAsync();
+
+        if (user == null) return Results.NotFound();
+
+        user.EmailToken = GenerateToken(32);
+        await _context.SaveChangesAsync();
+
+        _emailSender.SendMail(user.Email, "[CalendarMate] Recover your account", 
+        $"""
+        Recovery link => <a href=\"https://localhost:5000/auth/verify?email={user.Email}&token={user.EmailToken}\">Click this link to reset password to \"password\"<a>
+        """);
+        return Results.Ok();
+    }
+
     [Route("recover")]
     [HttpGet]
     public async Task<IResult> RecoverPassword([FromQuery(Name = "id")] int id, [FromQuery(Name = "token")] string token)
