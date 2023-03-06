@@ -85,7 +85,7 @@ public class AuthController : ControllerBase
         user.IsVerified = true;
         await _context.SaveChangesAsync();
 
-        return Results.Ok();
+        return Results.Redirect("https://localhost:5000/#/auth/login", true);
     }
 
     [Route("forgot")]
@@ -121,7 +121,7 @@ public class AuthController : ControllerBase
         user.PasswordHash = GetSHA256("password");
         await _context.SaveChangesAsync();
 
-        return Results.Accepted();
+        return Results.Redirect("https://localhost:5000/#/auth/login", true);
     }
 
     [Route("account")]
@@ -189,7 +189,7 @@ public class AuthController : ControllerBase
 
         if (user == null) return Results.NotFound();
         else if (user.PasswordHash != GetSHA256(_user.PasswordHash)) return Results.Unauthorized();
-        else if (!user.IsVerified) return Results.Forbid();
+        else if (!user.IsVerified) return Results.StatusCode(403);
         else
         {
             _session.AddUser(user.UserId, out var ssid);
