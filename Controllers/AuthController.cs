@@ -85,7 +85,7 @@ public class AuthController : ControllerBase
         user.IsVerified = true;
         await _context.SaveChangesAsync();
 
-        return Results.Ok();
+        return Results.Redirect("https://localhost:5000/#/auth/login", true);
     }
 
     [Route("forgot")]
@@ -121,21 +121,64 @@ public class AuthController : ControllerBase
         user.PasswordHash = GetSHA256("password");
         await _context.SaveChangesAsync();
 
-        return Results.Accepted();
+        return Results.Redirect("https://localhost:5000/#/auth/login", true);
     }
 
     [Route("account")]
     [HttpGet]
-    public IResult GetAccount()
+    public async Task<IResult> GetAccount()
     {
-        var ssid = Request.Cookies["Auth"];
-        if (ssid == null) return Results.BadRequest();
-        if (!_session.Exist(Guid.Parse(ssid))) return Results.Unauthorized();
+        var ssid = Request.Cookies["sessionId"];
+        if (!Guid.TryParse(ssid, out var guid)) return Results.BadRequest();
+        if (!_session.TryGetUser(guid, out var userId)) return Results.NotFound();
 
-        var userinfo = _session.GetUser(Guid.Parse(ssid));
-        userinfo.PasswordHash = "";
+        var user = await _context.ApplicationUsers.FindAsync(userId);
+        if (user == null) return Results.NotFound();
+        user.PasswordHash = "";
+        user.EmailToken = "";
 
-        return Results.Ok(userinfo);
+        return Results.Ok(user);
+    }
+
+    [Route("account")]
+    [HttpPut]
+    public async Task<IResult> PutAccount(ApplicationUser inputUser)
+    {
+        var ssid = Request.Cookies["sessionId"];
+        if (ssid == null) return Results.Unauthorized();
+        if (!Guid.TryParse(ssid, out var guid)) return Results.BadRequest();
+        if (!_session.TryGetUser(guid, out var userId)) return Results.NotFound();
+
+        var user = await _context.ApplicationUsers.FindAsync(userId);
+
+        if (user == null) return Results.NotFound();
+        user.UserName = inputUser.UserName;
+
+        await _context.SaveChangesAsync();
+
+        return Results.Created($"/auth/account/{user.UserId}", user);
+    }
+
+    [Route("pass")]
+    [HttpPut]
+    public async Task<IResult> PutPassword(ApplicationUser inputUser)
+    {
+        // inputUser.UserName: new password
+        // inputUser.PasswordHash = previous password
+        var ssid = Request.Cookies["sessionId"];
+        if (ssid == null) return Results.Unauthorized();
+        if (!Guid.TryParse(ssid, out var guid)) return Results.BadRequest();
+        if (!_session.TryGetUser(guid, out var userId)) return Results.NotFound();
+
+        var user = await _context.ApplicationUsers.FindAsync(userId);
+
+        if (user == null) return Results.NotFound();
+        if (GetSHA256(inputUser.PasswordHash) != user.PasswordHash) return Results.Forbid();
+        user.PasswordHash = GetSHA256(inputUser.UserName);
+
+        await _context.SaveChangesAsync();
+
+        return Results.Created($"/auth/account/{user.UserId}", user);
     }
 
     [Route("login")]
@@ -146,14 +189,13 @@ public class AuthController : ControllerBase
 
         if (user == null) return Results.NotFound();
         else if (user.PasswordHash != GetSHA256(_user.PasswordHash)) return Results.Unauthorized();
-        else if (!user.IsVerified) return Results.Forbid();
+        else if (!user.IsVerified) return Results.StatusCode(403);
         else
         {
-            _session.AddUser(user, out var ssid);
+            _session.AddUser(user.UserId, out var ssid);
 
-            Response.Cookies.Append("Auth", ssid.ToString(), new CookieOptions
+            Response.Cookies.Append("sessionId", ssid.ToString(), new CookieOptions
             {
-                Expires = DateTime.Now.AddDays(1),
                 SameSite = SameSiteMode.None,
                 Secure = true,
                 HttpOnly = true
@@ -167,13 +209,13 @@ public class AuthController : ControllerBase
     [HttpGet]
     public IResult Logout()
     {
-        var ssid = Request.Cookies["Auth"];
+        var ssid = Request.Cookies["sessionId"];
         if (ssid == null) return Results.BadRequest();
 
         if (_session.RemoveUser(Guid.Parse(ssid)))
         {
             Console.WriteLine($"SSID {ssid} has been deleted.");
-            Response.Cookies.Delete("Auth", new CookieOptions
+            Response.Cookies.Delete("sessionId", new CookieOptions
             {
                 SameSite = SameSiteMode.None,
                 Secure = true,
