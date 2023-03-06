@@ -97,7 +97,7 @@ public class AuthController : ControllerBase
             from u in _context.ApplicationUsers
             where (u.Email == _user.Email && u.UserName == _user.UserName)
             select u
-        ).FirstAsync();
+        ).FirstOrDefaultAsync();
 
         if (user == null) return Results.NotFound();
 

@@ -4,6 +4,7 @@
 	import Main from "./Main/Main.svelte";
 	import Login from "./Auth/Login.svelte";
 	import Register from "./Auth/Register.svelte";
+	import Forgot from "./Auth/Forgot.svelte";
 	import NotFound from "./Error/404.svelte";
 	import NavBar from "./NavBar.svelte";
 	import Router from "svelte-spa-router";
@@ -14,6 +15,7 @@
 		'/main': Main,
 		'/auth/login': Login,
 		'/auth/register': Register,
+		'/auth/forgot': Forgot,
 		'/*': NotFound
 	};
 </script>

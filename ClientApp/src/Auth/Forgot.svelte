@@ -1,20 +1,18 @@
 <script lang="ts">
-    import type { UserInfo } from '../UserInfoStore';
-    import { userinfo } from '../UserInfoStore';
-    import { fetchGet, fetchPost } from '../functions'
+    import { fetchPost } from '../functions'
 
     let email = '';
-    let password = '';
+    let username = '';
     let validMessage = '';
 
-    async function clickLoginBtn(): Promise<void> {
+    async function clickRecoverBtn(): Promise<void> {
 
         if (!checkValidation()) return;
 
-        let ret = await fetchPost('/auth/login', {
-            "UserName": 'username',
+        let ret = await fetchPost('/auth/forgot', {
+            "UserName": username,
             "Email": email,
-            "PasswordHash": password
+            "PasswordHash": "dummy"
         });
 
         await processLogin(ret.status);
@@ -24,18 +22,7 @@
         switch (status)
         {
             case 200:
-                let res = await fetchGet('/auth/account');
-                if (res.status != 200) {
-                    validMessage = "Something went wrong...";
-                    return;
-                }
-                
-                let data: UserInfo = await res.json();
-                userinfo.set(data);
-                document.location.href = '/';
-                break;
-            case 401:
-                validMessage = 'Email or Password is incorrect';
+                validMessage = 'Email was sent. Click link in an email to recover yout password';
                 break;
             case 404:
                 validMessage = 'This account does not exist';
@@ -49,6 +36,11 @@
     function checkValidation(): boolean {
         validMessage = '';
 
+        if (username === '') {
+            validMessage = 'Username field is empty';
+            return false;
+        }
+
         if (email === '') {
             validMessage = 'Email field is empty';
             return false;
@@ -61,27 +53,20 @@
             return false;
         }
 
-        if (password === '') {
-            validMessage = 'Password field is empty';
-            return false;
-        }
-
         return true;
     }
 </script>
 
 <main>
-    <h1>Login</h1>
+    <h1>Recover</h1>
     <form>
         <p class="valid">{validMessage}</p>
+        <p>Username</p>
+        <p><input class="field" type="text" bind:value={username} required/></p>
         <p>Email</p>
         <p><input class="field" type="text" bind:value={email} required/></p>
-        <p>Password</p>
-        <p><input class="field" type="password" bind:value={password} required/></p>
-        <p><a href="/#/auth/forgot">Forgot Password?</a></p>
-        <p><a href="/#/auth/register">Create Account</a></p>
     </form>
-    <button class="field" on:click={clickLoginBtn}>Login</button>
+    <button class="field" on:click={clickRecoverBtn}>Reset Password</button>
 </main>
 
 <style>
