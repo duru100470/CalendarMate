@@ -18,6 +18,7 @@ export const userinfo = {
     set: (_info: UserInfo) => {
         setUserInfo(_info);
         update(() => _info);
-    }
+    },
+    get: getUserInfo
 }
 export type { UserInfo };

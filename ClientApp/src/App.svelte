@@ -1,23 +1,13 @@
 <script lang="ts">
-	import Home from "./Home/Home.svelte";
-	import Test from "./Test/Test.svelte";
-	import Main from "./Main/Main.svelte";
-	import Login from "./Auth/Login.svelte";
-	import Register from "./Auth/Register.svelte";
-	import Forgot from "./Auth/Forgot.svelte";
-	import NotFound from "./Error/404.svelte";
+	import { routes, authRoutes } from "./routes";
+    import { userinfo } from "./UserInfoStore";
 	import NavBar from "./NavBar.svelte";
-	import Router from "svelte-spa-router";
+	import Router, { location } from "svelte-spa-router";
 
-	const routes = {
-		'/': Home,
-		'/test': Test,
-		'/main': Main,
-		'/auth/login': Login,
-		'/auth/register': Register,
-		'/auth/forgot': Forgot,
-		'/*': NotFound
-	};
+	$: if (authRoutes[$location]) {
+		if (userinfo.get() == null)
+			document.location.href = '/#/auth/login';
+	}
 </script>
 
 <main>
