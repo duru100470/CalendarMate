@@ -141,6 +141,20 @@ public class AuthController : ControllerBase
         return Results.Ok(user);
     }
 
+    [Route("account/{id}")]
+    [HttpGet("{id}")]
+    public async Task<IResult> GetAccount(int id)
+    {
+        var user = await _context.ApplicationUsers.FindAsync(id);
+        if (user == null) return Results.NotFound();
+        user.PasswordHash = "";
+        user.Email = "";
+        user.IsVerified = false;
+        user.EmailToken = "";
+
+        return Results.Ok(user);
+    }
+
     [Route("account")]
     [HttpPut]
     public async Task<IResult> PutAccount(ApplicationUser inputUser)
