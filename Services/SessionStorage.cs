@@ -34,11 +34,13 @@ public class SessionStorage : ISessionStorage
 
     public bool Exist(Guid guid)
     {
+        Print();
         return session.ContainsKey(guid);
     }
 
     public ApplicationUser GetUser(Guid guid)
     {
+        Print();
         return session[guid];
     }
 

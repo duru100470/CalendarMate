@@ -138,6 +138,47 @@ public class AuthController : ControllerBase
         return Results.Ok(userinfo);
     }
 
+    [Route("account")]
+    [HttpPut]
+    public async Task<IResult> PutAccount(ApplicationUser inputUser)
+    {
+        var ssid = Request.Cookies["Auth"];
+        if (ssid == null) return Results.Unauthorized();
+        if (!_session.Exist(Guid.Parse(ssid))) return Results.NotFound();
+
+        var userId = _session.GetUser(Guid.Parse(ssid)).UserId;
+        var user = await _context.ApplicationUsers.FindAsync(userId);
+
+        if (user == null) return Results.NotFound();
+        user.UserName = inputUser.UserName;
+
+        await _context.SaveChangesAsync();
+
+        return Results.Created($"/auth/account/{user.UserId}", user);
+    }
+
+    [Route("pass")]
+    [HttpPut]
+    public async Task<IResult> PutPassword(ApplicationUser inputUser)
+    {
+        // inputUser.UserName: new password
+        // inputUser.PasswordHash = previous password
+        var ssid = Request.Cookies["Auth"];
+        if (ssid == null) return Results.Unauthorized();
+        if (!_session.Exist(Guid.Parse(ssid))) return Results.NotFound();
+
+        var userId = _session.GetUser(Guid.Parse(ssid)).UserId;
+        var user = await _context.ApplicationUsers.FindAsync(userId);
+
+        if (user == null) return Results.NotFound();
+        if (GetSHA256(inputUser.PasswordHash) != user.PasswordHash) return Results.Forbid();
+        user.PasswordHash = GetSHA256(inputUser.UserName);
+
+        await _context.SaveChangesAsync();
+
+        return Results.Created($"/auth/account/{user.UserId}", user);
+    }
+
     [Route("login")]
     [HttpPost]
     public IResult Login(ApplicationUser _user)
