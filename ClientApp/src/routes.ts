@@ -4,6 +4,7 @@ import Main from "./Main/Main.svelte";
 import Login from "./Auth/Login.svelte";
 import Register from "./Auth/Register.svelte";
 import Forgot from "./Auth/Forgot.svelte";
+import Account from "./Auth/Account.svelte";
 import NotFound from "./Error/404.svelte";
 
 const value = {
@@ -13,6 +14,7 @@ const value = {
     '/auth/login': { "comp": Login, "auth": false },
     '/auth/register': { "comp": Register, "auth": false },
     '/auth/forgot': { "comp": Forgot, "auth": false },
+    '/auth/account': { "comp": Account, "auth": true },
     '/*': { "comp": NotFound, "auth": false }
 };
 
