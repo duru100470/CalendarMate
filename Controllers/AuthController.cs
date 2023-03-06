@@ -15,12 +15,14 @@ public class AuthController : ControllerBase
     private readonly CalendarMate.Data.CalendarDbContext _context;
     private readonly ISessionStorage _session;
     private readonly IEmailSender _emailSender;
+    private readonly IAuthManager _authManager;
 
-    public AuthController(CalendarMate.Data.CalendarDbContext context, ISessionStorage session, IEmailSender emailSender)
+    public AuthController(CalendarMate.Data.CalendarDbContext context, ISessionStorage session, IEmailSender emailSender, IAuthManager authManager)
     {
         _context = context;
         _session = session;
         _emailSender = emailSender;
+        _authManager = authManager;
     }
 
     [Route("test")]
@@ -128,10 +130,8 @@ public class AuthController : ControllerBase
     [HttpGet]
     public async Task<IResult> GetAccount()
     {
-        var ssid = Request.Cookies["sessionId"];
-        if (ssid == null) return Results.Unauthorized();
-        if (!Guid.TryParse(ssid, out var guid)) return Results.BadRequest();
-        if (!_session.TryGetUser(guid, out var userId)) return Results.Unauthorized();
+        var auth = _authManager.CheckSession(Request, out var userId);
+        if (auth != Results.Ok()) return auth;
 
         var user = await _context.ApplicationUsers.FindAsync(userId);
         if (user == null) return Results.NotFound();
@@ -141,14 +141,26 @@ public class AuthController : ControllerBase
         return Results.Ok(user);
     }
 
+    [Route("account/{id}")]
+    [HttpGet("{id}")]
+    public async Task<IResult> GetAccount(int id)
+    {
+        var user = await _context.ApplicationUsers.FindAsync(id);
+        if (user == null) return Results.NotFound();
+        user.PasswordHash = "";
+        user.Email = "";
+        user.IsVerified = false;
+        user.EmailToken = "";
+
+        return Results.Ok(user);
+    }
+
     [Route("account")]
     [HttpPut]
     public async Task<IResult> PutAccount(ApplicationUser inputUser)
     {
-        var ssid = Request.Cookies["sessionId"];
-        if (ssid == null) return Results.Unauthorized();
-        if (!Guid.TryParse(ssid, out var guid)) return Results.BadRequest();
-        if (!_session.TryGetUser(guid, out var userId)) return Results.Unauthorized();
+        var auth = _authManager.CheckSession(Request, out var userId);
+        if (auth != Results.Ok()) return auth;
 
         var user = await _context.ApplicationUsers.FindAsync(userId);
 
@@ -166,10 +178,8 @@ public class AuthController : ControllerBase
     {
         // inputUser.UserName: new password
         // inputUser.PasswordHash = previous password
-        var ssid = Request.Cookies["sessionId"];
-        if (ssid == null) return Results.Unauthorized();
-        if (!Guid.TryParse(ssid, out var guid)) return Results.BadRequest();
-        if (!_session.TryGetUser(guid, out var userId)) return Results.Unauthorized();
+        var auth = _authManager.CheckSession(Request, out var userId);
+        if (auth != Results.Ok()) return auth;
 
         var user = await _context.ApplicationUsers.FindAsync(userId);
 

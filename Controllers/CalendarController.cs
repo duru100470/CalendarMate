@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CalendarMate;
+using CalendarMate.Data;
+using CalendarMate.Models;
+using CalendarMate.Services;
 
 namespace CalendarMate.Controllers;
 
@@ -8,11 +11,13 @@ namespace CalendarMate.Controllers;
 [Route("[controller]")]
 public class CalendarController : ControllerBase
 {
-    private readonly CalendarMate.Data.CalendarDbContext _context;
+    private readonly CalendarDbContext _context;
+    private readonly IAuthManager _authManager;
 
-    public CalendarController(CalendarMate.Data.CalendarDbContext context)
+    public CalendarController(CalendarDbContext context, IAuthManager authManager)
     {
         _context = context;
+        _authManager = authManager;
     }
 
     [HttpGet]
@@ -23,14 +28,17 @@ public class CalendarController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IResult> Post(CalendarMate.Models.Event _event)
+    public async Task<IResult> Post(Event _event)
     {
-        var newEvent = new CalendarMate.Models.Event
+        var auth = _authManager.CheckSession(Request, out var userId);
+        if (auth != Results.Ok()) return auth;
+
+        var newEvent = new Event
         {
             Title = _event.Title,
             Date = _event.Date,
             Description = _event.Description,
-            UserId = _event.UserId
+            UserId = userId ?? 0
         };
 
         await _context.AddAsync(newEvent);
@@ -42,22 +50,30 @@ public class CalendarController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IResult> Delete(int id)
     {
-        if (await _context.Events.FindAsync(id) is CalendarMate.Models.Event _event)
-        {
-            _context.Events.Remove(_event);
-            await _context.SaveChangesAsync();
-            return TypedResults.Ok(_event);
-        }
+        var auth = _authManager.CheckSession(Request, out var userId);
+        if (auth != Results.Ok()) return auth;
 
-        return TypedResults.NotFound();
+        var _event = await _context.Events.FindAsync(id);
+        if (_event == null)
+            return TypedResults.NotFound();
+
+        if (_event.UserId != userId) return Results.StatusCode(403);
+
+        _context.Events.Remove(_event);
+        await _context.SaveChangesAsync();
+        return TypedResults.Ok(_event);
     }
 
     [HttpPut("{id}")]
-    public async Task<IResult> Put(int id, CalendarMate.Models.Event inputEvent)
+    public async Task<IResult> Put(int id, Event inputEvent)
     {
+        var auth = _authManager.CheckSession(Request, out var userId);
+        if (auth != Results.Ok()) return auth;
+
         var _event = await _context.Events.FindAsync(id);
 
         if (_event is null) return TypedResults.NotFound();
+        if (_event.UserId != userId) return Results.StatusCode(403);
 
         _event.Title = inputEvent.Title;
         _event.Date = inputEvent.Date;
