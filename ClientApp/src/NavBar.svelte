@@ -15,6 +15,7 @@
     async function logout(): Promise<void> {
         await fetchGet('/auth/logout');
         userinfo.set(null);
+        isLoggedIn = false;
     }
 </script>
 

@@ -22,6 +22,7 @@ function fetchPost(url: string, data: any) {
 }
 
 function fetchPut(url: string, data: any) {
+  console.log(`${url}\n${JSON.stringify(data)}`);
   return fetch(baseLink + url, {
     method: "PUT",
     mode: "cors",

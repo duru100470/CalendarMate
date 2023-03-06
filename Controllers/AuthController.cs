@@ -97,7 +97,7 @@ public class AuthController : ControllerBase
             from u in _context.ApplicationUsers
             where (u.Email == _user.Email && u.UserName == _user.UserName)
             select u
-        ).FirstAsync();
+        ).FirstOrDefaultAsync();
 
         if (user == null) return Results.NotFound();
 
@@ -129,8 +129,9 @@ public class AuthController : ControllerBase
     public async Task<IResult> GetAccount()
     {
         var ssid = Request.Cookies["sessionId"];
+        if (ssid == null) return Results.Unauthorized();
         if (!Guid.TryParse(ssid, out var guid)) return Results.BadRequest();
-        if (!_session.TryGetUser(guid, out var userId)) return Results.NotFound();
+        if (!_session.TryGetUser(guid, out var userId)) return Results.Unauthorized();
 
         var user = await _context.ApplicationUsers.FindAsync(userId);
         if (user == null) return Results.NotFound();
@@ -147,7 +148,7 @@ public class AuthController : ControllerBase
         var ssid = Request.Cookies["sessionId"];
         if (ssid == null) return Results.Unauthorized();
         if (!Guid.TryParse(ssid, out var guid)) return Results.BadRequest();
-        if (!_session.TryGetUser(guid, out var userId)) return Results.NotFound();
+        if (!_session.TryGetUser(guid, out var userId)) return Results.Unauthorized();
 
         var user = await _context.ApplicationUsers.FindAsync(userId);
 
@@ -156,7 +157,7 @@ public class AuthController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return Results.Created($"/auth/account/{user.UserId}", user);
+        return Results.Created($"/auth/account", user);
     }
 
     [Route("pass")]
@@ -168,7 +169,7 @@ public class AuthController : ControllerBase
         var ssid = Request.Cookies["sessionId"];
         if (ssid == null) return Results.Unauthorized();
         if (!Guid.TryParse(ssid, out var guid)) return Results.BadRequest();
-        if (!_session.TryGetUser(guid, out var userId)) return Results.NotFound();
+        if (!_session.TryGetUser(guid, out var userId)) return Results.Unauthorized();
 
         var user = await _context.ApplicationUsers.FindAsync(userId);
 
@@ -178,7 +179,7 @@ public class AuthController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return Results.Created($"/auth/account/{user.UserId}", user);
+        return Results.Created($"/auth/account", user);
     }
 
     [Route("login")]
