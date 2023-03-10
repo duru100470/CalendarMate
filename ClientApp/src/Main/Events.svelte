@@ -50,10 +50,13 @@
 		margin: auto;
 		margin-bottom: 2px;
 		width: 100%;
-		height: 20px;
+		min-height: 20px;
 		display: flex;
 		align-items: center; /* 가로 - 중앙으로 */
-		padding: 2;
+		justify-content: flex-start;
+		padding-left: 1;
+		padding-top: 0;
+		padding-bottom: 0;
 		border: none;
 		transition: all 0.2s ;
 		background-color: #ffd49f;

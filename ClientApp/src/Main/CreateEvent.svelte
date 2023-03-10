@@ -2,6 +2,7 @@
     import { fetchPost } from "../functions";
     import { createEventDispatcher } from "svelte";
     import { eventDBStore } from "./EventDBStore";
+    import { userinfo } from "../UserInfoStore";
     import type { event } from "./EventDBStore";
 
     const dispatch = createEventDispatcher();
@@ -17,7 +18,7 @@
             title: title,
             date: date + "T00:00:00",
             description: description,
-            userId: 1
+            userId: 0
         };
 
         let res = await fetchPost("/calendar", curEvent);
@@ -33,7 +34,7 @@
 </script>
 
 <h1>New Event</h1>
-<p>Title: <input type="text" bind:value={title} /></p>
+<p>Title: <input type="text" maxlength="20" bind:value={title} /></p>
 <p>Date: <input type="date" bind:value={date} /></p>
 <p>Description: <input type="text" bind:value={description} /></p>
 <button on:click={createEvent}>Create Event</button>

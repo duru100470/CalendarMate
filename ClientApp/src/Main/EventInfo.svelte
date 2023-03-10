@@ -56,7 +56,7 @@
 <button on:click={deleteEvent} style="color: #ff3e00;">Delete</button>
 {:else}
 <form>
-    <p>Title: <input type="text" bind:value={newEvent.title} /></p>
+    <p>Title: <input type="text" maxlength="20" bind:value={newEvent.title} /></p>
     <p>Date: <input type="date" bind:value={newEvent.date} /></p>
     <p>Description: <input type="text" bind:value={newEvent.description} /></p>
     <button on:click={onClickSaveBtn}>Save</button>
